@@ -79,7 +79,7 @@
 ;----------
 ;Local data 
 ;----------
-	USER_PROMPT .STRINGZ "ENTER two numbers: \n"
+	USER_PROMPT .STRINGZ "ENTER two numbers (i.e '0'....'9')\n"
 	NEWLINE .STRINGZ "\n"
 	MINUS .STRINGZ " - "
 	EQUALS .STRINGZ " = "
