@@ -1,11 +1,15 @@
-;=========================================================
-;Chuanping Fan
-;cfan002@ucr.edu
-;Lab Section 026
+;=================================================
+; Name: Fan, Chuanping
+; Username: cfan002
+; 
+; Assignment name: <assn 2>
+; Lab section: 029
+; TA: Jose Rodriguez
+; 
+; I hereby certify that I have not received assistance on this assignment,
+; or used code, from ANY outside source other than the instruction team.
 ;
-;Assignment 2
-;Created: 4/8/15
-;=========================================================
+;=================================================
 .ORIG x3000
 ;------------
 ;Instructions
@@ -53,6 +57,10 @@
 	BRn NEGATIVENUM
 	ADD R0, R0, R6 ; Convert back to ascii
 	OUT
+
+	LEA R0, NEWLINE; NEWLINE
+	PUTS
+
 	HALT
 
 	NEGATIVENUM
@@ -63,6 +71,9 @@
 		ADD R0, R0, #1
 		ADD R0, R0, R6 ; Convert back to ascii
 		OUT	
+	
+		LEA R0, NEWLINE; NEWLINE
+		PUTS
 
 		HALT
 ;----------
