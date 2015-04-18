@@ -1,90 +1,84 @@
 ;=================================================
-; Name: Fan, Chuanping
+; 
+; Name: Chuanping Fan
 ; Username: cfan002
-; 
-; Assignment name: <assn 3>
+;
+; SID: 861105608
+; Assignment name: assn 3
 ; Lab section: 029
-; TA: Jose Rodriguez
-; 
-; I hereby certify that I have not received assistance on this assignment,
-; or used code, from ANY outside source other than the instruction team.
+; TA: Jose
+;
+; I hereby certify that I have not received 
+; assistance on this assignment, or used code,
+; from ANY outside source other than the
+; instruction team. 
 ;
 ;=================================================
-.ORIG x3000
-;------------
-;Instructions
-;------------
-	LEA R0, USER_PROMPT ;Load user prompt
-	LD R7, ASCII
-	LD R6, ASCIIp
-	PUTS ;Output
 
-	GETC
-	OUT
-	ADD R1, R0, #0 ; put Value from 0(input) to Register 1
+                .ORIG x3000			    ; Program begins here
+                ;-------------
+                ;Instructions
+                ;-------------
+                LD R6, Convert_addr		; R6 <-- Address pointer for Convert
+                LDR R1, R6, #0			; R1 <-- VARIABLE Convert 
+								;-------------------------------
+                ;INSERT CODE STARTING FROM HERE
+                ;--------------------------------
+								LD R3, sCOUNTER
 
-	LEA R0, NEWLINE; NEWLINE
-	PUTS
+								OUTERLOOP
+								LD R2, bCOUNTER			;Inside outerloop because counter needs to be reset
 
-	GETC
-	OUT
-	ADD R2, R0, #0 ; put Value from 0(input) to Register 2
+								MAINLOOP
+								ADD R1, R1, #0 			;enable Br comparison
+								BRzp POS 						;Positive number
+								BRn NEG
 
-	LEA R0, NEWLINE; NEWLINE
-	PUTS
+								POS
+									LEA	R0, OUT0
+									PUTS
+									BRzp AFTERLOOP
 
+								NEG
+									LEA R0, OUT1
+									PUTS
 
-	;DISPLAY STUFF==============
-	ADD R0, R1, #0
-	OUT
+								AFTERLOOP
+								
+								ADD R1, R1, R1		;Left shift by doubling value in R1
+								ADD R2, R2, #-1		;Reduce counter by 1
+                
+								BRp MAINLOOP			;
+								BRz ADDSPACE			;
 
-	LEA R0, MINUS ; -
-	PUTS
+								ADDSPACE
+								ADD R3, R3, #0
+								BRz END
+								LEA R0, SPACE
+								PUTS
+								
+								ADD R3, R3, #-1
+								BRzp OUTERLOOP
+																	;Last 4 bits
 
-	ADD R0, R2, #0
-	OUT
+								END
+								LEA R0, NEWLINE
+								PUTS
+								HALT
+                ;---------------	
+                ;Data
+                ;---------------
+Convert_addr    .FILL x5000	            ; The address of where to find the data
+bCOUNTER 				.FILL 4						;4 bits, then space
+sCOUNTER 				.FILL 3						  ;for spaces (end must be terminated with newline)
+OUT0						.STRINGZ "0"
+OUT1						.STRINGZ "1"
+SPACE						.STRINGZ " "
+NEWLINE					.STRINGZ "\n"
 
-	LEA R0, EQUALS ; =
-	PUTS
-	;DISPLAY STUfF===============
-	ADD R1, R1, R7 ; convert to decimal
-	ADD R2, R2, R7 ; convert to decimal
-
-	NOT R2, R2 ;inverts number in R2 and loads it in R2
-	ADD R2, R2, #1
-	
-	ADD R0, R1, R2 ; ; Do summation
-	BRn NEGATIVENUM
-	ADD R0, R0, R6 ; Convert back to ascii
-	OUT
-
-	LEA R0, NEWLINE; NEWLINE
-	PUTS
-
-	HALT
-
-	NEGATIVENUM
-		LEA R0, NEGATIVE ; indicates negative number
-		PUTS
-		ADD R0, R1, R2 ; ; Do summation
-		NOT R0, R0
-		ADD R0, R0, #1
-		ADD R0, R0, R6 ; Convert back to ascii
-		OUT	
-	
-		LEA R0, NEWLINE; NEWLINE
-		PUTS
-
-		HALT
-;----------
-;Local data 
-;----------
-	USER_PROMPT .STRINGZ "ENTER two numbers (i.e '0'....'9')\n"
-	NEWLINE .STRINGZ "\n"
-	MINUS .STRINGZ " - "
-	EQUALS .STRINGZ " = "
-	NEGATIVE .STRINGZ "-"
-	ASCII .fill #-48
-	ASCIIp .fill #48
-.END
-
+                .ORIG x5000			    ; Remote data
+Convert         .FILL xABCD		        ; <----!!!NUMBER TO BE CONVERTED TO BINARY!!!
+                ;---------------	
+                ;END of PROGRAM
+                ;---------------	
+                .END
