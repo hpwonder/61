@@ -16,10 +16,6 @@
 ;=================================================
 
 .ORIG x3000			; Program begins here
-;-------------
-;Instructions
-;-------------
-
 ;-------------------------------
 ;INSERT CODE STARTING FROM HERE 
 ;--------------------------------
@@ -74,19 +70,25 @@ BEGIN
 	LOADSTASH
 		LD R3, arraybegin ;set array back to beginning
 			OUTERLOOP
+				LD R5, ZERO ; reset
 				LDR R0, R3, #0 ;put current value of array into R3
-				ADD R7, R0, #0 ; Copy it into R7
+				ADD R5, R0, #0 ; Copy it into R5
 				ADD R2, R4, #0 ;copy r4 into r2
 				ADD R2, R2, #-1 ;subtract 1 from 10^
 				BRz ONESDIGIT
 			RELOAD ;multiply by another set of 10
-				LD R5, TEN ;load 10 for decimal multiplication
-				ADD R5, R5, #-1
 			INNERLOOP	;multiply by 10
-				ADD R0, R0, R7
-				ADD R5, R5, #-1 
-				BRp INNERLOOP
-			ADD R7, R0, #0 ;next digit
+				ADD R0, R0, R5
+				ADD R0, R0, R5
+				ADD R0, R0, R5
+				ADD R0, R0, R5
+				ADD R0, R0, R5
+				ADD R0, R0, R5
+				ADD R0, R0, R5
+				ADD R0, R0, R5
+				ADD R0, R0, R5
+			LD R5, ZERO
+			ADD R5, R0, #0 ;next digit
 			ADD R2, R2, #-1
 			BRp RELOAD
 		ONESDIGIT
@@ -153,7 +155,3 @@ error_mes .STRINGZ	"ERROR INVALID INPUT\n"
 ;END of PROGRAM
 ;---------------
 .END
-;-------------------
-;PURPOSE of PROGRAM
-;-------------------
-
