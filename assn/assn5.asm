@@ -185,17 +185,11 @@ posASCII .FILL #-58
 ENTER .FILL #-10
 TEN .FILL #10
 
-;------------
-.ORIG x4000 ;Array starts here
-;------------
-;Remote data
-;------------
 ;-------------------------------------------------------
 ; Subroutine to multiply two numbers in Register x and Register y,
 ; and store product into Register z
 ;-------------------------------------------------------
 .ORIG x3400
-
 
 ;-------------------------------------------------------
 ; Subroutine to ouput number in Register x
@@ -208,6 +202,9 @@ TEN .FILL #10
 ;Data for subroutine:
 ;--------------
 
+;------------
+.ORIG x4000 ;Array starts here
+;------------
 
 ;--------------
 .ORIG x6000
