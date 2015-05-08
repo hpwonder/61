@@ -20,7 +20,7 @@
 ;INSERT CODE STARTING FROM HERE 
 ;--------------------------------
 ;TO Output Intro Message
-VERYBEGIN
+BEGIN_GET_INPUT
 LD R1, ZERO ;Initialize final register to 0
 LD R2, ZERO ; used as a temp
 LD R3, arraybegin ; outer counter
@@ -108,7 +108,7 @@ BEGIN
 		PUTS
 		LD R0, errorMessage
 		PUTS
-		BR VERYBEGIN
+		BR BEGIN_GET_INPUT
 	negINPUT ;negative detected, waiting for first number
 		ADD R6, R6, #1
 		BR FIRSTSKIP 
