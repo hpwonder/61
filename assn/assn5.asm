@@ -27,16 +27,56 @@ ADD R2, R1, #0
 LD R0, GET_INPUT ;enter subroutine GET_INPUT
 JSRR R0
 
+LD R0, MULT_OP ;enter subroutine MULT_OP
+JSRR R0
+
+LD R6, PRODFLAG ;keeps track of how many negative signs were entered
+
+;========first number
+LD R4, SETTOZERO
+ADD R4, R2, #0
+LD R0, PRINT_REG
+JSRR R0
+;========= *
+LEA R0, TIMES
+PUTS
+;========= second number
+LD R4, SETTOZERO
+ADD R4, R1, #0
+LD R0, PRINT_REG
+JSRR R0
+;==========  =
+LEA R0, EQUALS
+PUTS
+;========== Product
+LD R0, SETTOZERO
+ADD R0, R6, #0
+BRnp PRINTPRODUCT
+	NOT R3, R3 
+	ADD R3, R3, #1
+
+PRINTPRODUCT
+LD R4, SETTOZERO
+ADD R4, R3, #0
+LD R0, PRINT_REG
+JSRR R0
+
+LEA R0, NEWL
+PUTS
 
 HALT
 ;---------------	
 ;Data
 ;---------------
+SETTOZERO .FILL #0
 TIMES .STRINGZ " * "
 EQUALS .STRINGZ " = "
 OVERFLOW .STRINGZ "Overflow!"
+NEWL .STRINGZ "\n"
 GET_INPUT .FILL x3200
-
+MULT_OP .FiLL x3400
+PRINT_REG .FILL x3800
+PRODFLAG .FILL #-1 ;-1 = 1 negative sign, 0 = 1, 1 = 2
 ;------------
 ;Remote data
 ;------------
@@ -195,20 +235,242 @@ TEN .FILL #10
 ; and store product into Register z
 ;-------------------------------------------------------
 .ORIG x3400
+BEGIN_MULT_OP
+ST R0, R0_3400
+ST R1, R1_3400
+ST R2, R2_3400
+ST R4, R4_3400
+ST R5, R5_3400
+ST R6, R6_3400
+ST R7, R7_3400
 
+LD R5, RESETR
+LD R4, RESETR
+LD R3, RESETR
+;====ABS val both numbers so we can do standard mult with addition
+ABS1
+ADD R5, R1, #0 ;copy r1 to r5 and abs value
+BRz ITISZERO
+BRp ABS2
+	NOT R5, R5
+	ADD R5, R5, #1
 
+ABS2
+ADD R4, R2, #0 ;copy r2 to r4 and abs value
+BRz ITISZERO
+BRp CHECKSWAP
+	NOT R4, R4
+	ADD R4, R4, #1
+
+;====find out which number is smaller so we can do efficient mult
+CHECKSWAP
+LD R0, RESETR ;set r0 to 0
+NOT R5, R5
+ADD R5, R5, #1 ;temp convert r5 into neg
+ADD R0, R4, R5
+BRnz NEGORZERO ; R5 is bigger than R4 or the same
+	SWAP ;R4 is bigger than R5 so we need to swap the two
+	NOT R5, R5
+	ADD R5, R5, #1 ;REST R5 to original abs val of r1
+	LD R0, RESETR
+	ADD R0, R4, #0
+	LD R4, RESETR
+	ADD R4, R5, #0
+	LD R5, RESETR
+	ADD R5, R0, #0
+	BRnzp MULTWHILE
+NEGORZERO
+	NOT R5, R5
+	ADD R5, R5, #1 ;REST R5 to original abs val of r1
+;====main multiplication loop
+MULTWHILE
+	ADD R3, R3, R5
+	ADD R4, R4, #-1
+BRp MULTWHILE
+
+RESTORE
+LD R0, R0_3400
+LD R1, R1_3400
+LD R2, R2_3400
+LD R4, R4_3400
+LD R5, R5_3400
+LD R6, R6_3400
+LD R7, R7_3400
+
+RET
+
+ITISZERO
+LD R3, RESETR ;one of the multipliers is 0, so product is 0
+BRnzp RESTORE
+;---------------
+RESETR .FILL #0
+R0_3400 .BLKW #1
+R1_3400 .BLKW #1
+R2_3400 .BLKW #1
+R4_3400 .BLKW #1
+R5_3400 .BLKW #1
+R6_3400 .BLKW #1
+R7_3400 .BLKW #1
 ;-------------------------------------------------------
 ; Subroutine to ouput number in Register x
 ;-------------------------------------------------------
 .ORIG x3800
-;HINT back up your registers
+ST R0, R0_3800
+ST R1, R1_3800
+ST R2, R2_3800
+ST R3, R3_3800
+ST R5, R5_3800
+ST R7, R7_3800
+;R1, currently has input 1
+;R2, currently has input 2
+;R3, currently has product
+;R4, currently has numer to "decode"
+;R5, currently holds the current digit we are looking at
+;R6, currently keeps track of how many negatives there are
 
-;HINT Restore your registers
+LD R5, CHECKZER
+ADD R5, R4, #0
+BRp PRINTPOS;number is positive, print an +
+Brn PRINTNEG;number is negative, print a - 
+BRz PRINTSTART;number is 0, print nothing
+PRINTPOS
+	LEA R0, POSprint
+	PUTS
+	BRnzp PRINTSTART
+PRINTNEG
+	ADD R6, R6, #1
+	LEA R0, NEGprint
+	PUTS
+	NOT R4, R4
+	ADD R4, R4, #1
 
+PRINTSTART
+	
+	LD R1, CHECKZER ;set r1 to 0
+	TENTHOUS
+		LD R5, NEGTENT ;set r5 to -10000
+		ADD R4, R4, R5 ;subtract num from 10000
+		BRn UNDOTENT ;if it goes into negatives, undo it
+			ADD R1, R1, #1 ;else add 1 to digit counter
+			BRnzp TENTHOUS
+		UNDOTENT
+			LD R5, POSTENT ;add 10000 back in
+			ADD R4, R4, R5
+			BRnzp PRINTTENTHOUS
+		PRINTTENTHOUS
+			LD R0, CHECKZER ;set r1 to 0
+			LD R5, PRINTCONVERT; load ascii conversion into r5
+			ADD R0, R1, #0
+			ADD R0, R0, R5 
+		 	OUT							;print
+	
+	LD R1, CHECKZER
+	THOUS
+		LD R5, NEGT
+		ADD R4, R4, R5
+		BRn UNDOT
+			ADD R1, R1, #1 ;else add 1 to digit
+			BRnzp THOUS
+		UNDOT
+			LD R5, POST
+			ADD R4, R4, R5
+			BRnzp PRINTTHOUS
+		PRINTTHOUS
+			LD R0, CHECKZER
+			LD R5, PRINTCONVERT
+			ADD R0, R1, #0
+			ADD R0, R0, R5 ;convert from ascii to dec
+		 	OUT
+
+	LD R1, CHECKZER
+	HUNDRED
+		LD R5, NEGHUNDRED ;load -100
+		ADD R4, R4, R5 ;subtract 100 from total
+		BRn UNDOHUNDRED
+			ADD R1, R1, #1 ;else add 1 to digit
+			BRnzp HUNDRED ;go back and do it again if not negative
+		UNDOHUNDRED
+			LD R5, POSHUNDRED ;went into negatives, lets add it back in
+			ADD R4, R4, R5
+			BRnzp PRINTHUNDRED
+		PRINTHUNDRED
+			LD R0, CHECKZER
+			LD R5, PRINTCONVERT
+			ADD R0, R1, #0
+			ADD R0, R0, R5 ;convert from ascii to dec
+		 	OUT
+	
+	LD R1, CHECKZER
+	TENS
+		LD R5, NEGTEN ;load -10
+		ADD R4, R4, R5
+		BRn UNDOH
+			ADD R1, R1, #1 ;else add 1 to digit
+			BRnzp TENS 
+		UNDOH
+			LD R5, POSTEN ;load +10
+			ADD R4, R4, R5
+			BRnzp PRINTTEN
+		PRINTTEN
+			LD R0, CHECKZER
+			LD R5, PRINTCONVERT
+			ADD R0, R1, #0
+			ADD R0, R0, R5 ;convert from ascii to dec
+		 	OUT
+
+	LD R1, CHECKZER
+	ONES
+		LD R5, NEGUNO
+		ADD R4, R4, R5
+		BRn UNDOUNO
+			ADD R1, R1, #1 ;else add 1 to digit
+			BRnzp ONES
+		UNDOUNO
+			LD R5, POSUNO
+			ADD R4, R4, R5
+			BRnzp PRINTUNO
+		PRINTUNO
+			LD R0, CHECKZER
+			LD R5, PRINTCONVERT
+			ADD R0, R1, #0
+			ADD R0, R0, R5 ;convert from ascii to dec
+		 	OUT
+
+
+LD R0, R0_3800
+LD R1, R1_3800
+LD R2, R2_3800
+LD R3, R3_3800
+LD R5, R5_3800
+LD R7, R7_3800
+
+RET
 ;Data for subroutine:
 ;--------------
+CHECKZER .FILL #0
+POSTENT .FILL #10000
+NEGTENT .FILL #-10000
+POST .FILL #1000
+NEGT .FILL #-1000
+POSHUNDRED .FILL #100
+NEGHUNDRED .FILL #-100
+POSTEN .FILL #10
+NEGTEN .FILL #-10
+POSUNO .FILL #1
+NEGUNO .FILL #-1
+PRINTCONVERT .FILL #48
 
+NEGprint .STRINGZ "-"
+POSprint .STRINGZ "+"
+NEWLINEprint .STRINGZ "\n"
 
+R0_3800 .BLKW #1
+R1_3800 .BLKW #1
+R2_3800 .BLKW #1
+R3_3800 .BLKW #1
+R4_3800 .BLKW #1
+R5_3800 .BLKW #1
+R7_3800 .BLKW #1
 ;--------------
 .ORIG x6000
 intro .STRINGZ	"Input a positive or negative decimal number (max 5 digits), followed by ENTER\n"
