@@ -49,6 +49,9 @@ JSRR R0
 LEA R0, EQUALS
 PUTS
 ;========== Product
+;checks overflow
+LD R0, SETTOZERO
+;checks sign
 LD R0, SETTOZERO
 ADD R0, R6, #0
 BRnp PRINTPRODUCT
@@ -64,6 +67,11 @@ JSRR R0
 LEA R0, NEWL
 PUTS
 
+HALT
+
+OVERFLOW1
+LEA R0, OVERFLOW
+PUTS
 HALT
 ;---------------	
 ;Data
@@ -339,7 +347,7 @@ PRINTNEG
 	ADD R4, R4, #1
 
 PRINTSTART
-	
+	LD R2, CHECKZER ;set r2 to 0	
 	LD R1, CHECKZER ;set r1 to 0
 	TENTHOUS
 		LD R5, NEGTENT ;set r5 to -10000
@@ -354,10 +362,18 @@ PRINTSTART
 		PRINTTENTHOUS
 			LD R0, CHECKZER ;set r1 to 0
 			LD R5, PRINTCONVERT; load ascii conversion into r5
+			ADD R2, R2, #0
+			BRp PRINTZERO1
+				ADD R0, R1, #0
+				BRz SKIP1
+			PRINTZERO1
+			LD R0, CHECKZER
 			ADD R0, R1, #0
+			ADD R2, R1, #0
 			ADD R0, R0, R5 
 		 	OUT							;print
 	
+	SKIP1
 	LD R1, CHECKZER
 	THOUS
 		LD R5, NEGT
@@ -372,10 +388,18 @@ PRINTSTART
 		PRINTTHOUS
 			LD R0, CHECKZER
 			LD R5, PRINTCONVERT
+			ADD R2, R2, #0
+			BRp PRINTZERO2
+				ADD R0, R1, #0
+				BRz SKIP2
+			PRINTZERO2
+			LD R0, CHECKZER
 			ADD R0, R1, #0
-			ADD R0, R0, R5 ;convert from ascii to dec
-		 	OUT
-
+			ADD R2, R1, #0
+			ADD R0, R0, R5 
+		 	OUT							;print
+	
+	SKIP2	
 	LD R1, CHECKZER
 	HUNDRED
 		LD R5, NEGHUNDRED ;load -100
@@ -390,10 +414,18 @@ PRINTSTART
 		PRINTHUNDRED
 			LD R0, CHECKZER
 			LD R5, PRINTCONVERT
+			ADD R2, R2, #0
+			BRp PRINTZERO3
+				ADD R0, R1, #0
+				BRz SKIP3
+			PRINTZERO3
+			LD R0, CHECKZER
 			ADD R0, R1, #0
-			ADD R0, R0, R5 ;convert from ascii to dec
-		 	OUT
+			ADD R2, R1, #0
+			ADD R0, R0, R5 
+		 	OUT							;print
 	
+	SKIP3	
 	LD R1, CHECKZER
 	TENS
 		LD R5, NEGTEN ;load -10
@@ -408,10 +440,18 @@ PRINTSTART
 		PRINTTEN
 			LD R0, CHECKZER
 			LD R5, PRINTCONVERT
+			ADD R2, R2, #0
+			BRp PRINTZERO4
+				ADD R0, R1, #0
+				BRz SKIP4
+			PRINTZERO4
+			LD R0, CHECKZER
 			ADD R0, R1, #0
-			ADD R0, R0, R5 ;convert from ascii to dec
-		 	OUT
-
+			ADD R2, R1, #0
+			ADD R0, R0, R5 
+		 	OUT							;print
+	
+	SKIP4	
 	LD R1, CHECKZER
 	ONES
 		LD R5, NEGUNO
@@ -437,7 +477,6 @@ LD R2, R2_3800
 LD R3, R3_3800
 LD R5, R5_3800
 LD R7, R7_3800
-
 RET
 ;--------------
 ;Data for subroutine:
