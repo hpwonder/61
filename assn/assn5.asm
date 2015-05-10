@@ -225,11 +225,6 @@ posASCII .FILL #-58
 ENTER .FILL #-10
 TEN .FILL #10
 
-;------------
-.ORIG x4000 ;Array starts here
-;------------
-;Remote data
-;------------
 ;-------------------------------------------------------
 ; Subroutine to multiply two numbers in Register x and Register y,
 ; and store product into Register z
@@ -261,7 +256,6 @@ BRz ITISZERO
 BRp CHECKSWAP
 	NOT R4, R4
 	ADD R4, R4, #1
-
 ;====find out which number is smaller so we can do efficient mult
 CHECKSWAP
 LD R0, RESETR ;set r0 to 0
@@ -445,6 +439,7 @@ LD R5, R5_3800
 LD R7, R7_3800
 
 RET
+;--------------
 ;Data for subroutine:
 ;--------------
 CHECKZER .FILL #0
