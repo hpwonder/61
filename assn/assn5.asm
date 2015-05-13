@@ -247,6 +247,7 @@ ST R5, R5_3400
 ST R6, R6_3400
 ST R7, R7_3400
 
+LD R6, RESETR ;use r6 to keep track of overflow
 LD R5, RESETR
 LD R4, RESETR
 LD R3, RESETR
