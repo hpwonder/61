@@ -4,7 +4,7 @@
 ;05/13/2015
 ;
 ;Lab07
-;Exercise 1
+;Exercise 2
 ;=========================================================
 .ORIG x3000
 ;------------
@@ -15,18 +15,30 @@
 	LD R1, GET_STR_SUB
 	JSRR R1
 	
-	
-	LD R0, INPUT_ARRAY ;print out
-	PUTS
-
 	LD R6, INPUT_ARRAY
 	LD R1, IS_PAL
 	JSRR R1
-	HALT
+	
+	ADD R4, R4, #0
+	BRp PRINTYES
+	BRz PRINTNO
+
+			PRINTYES
+			LEA R0, YES
+			PUTS
+			HALT
+
+			PRINTNO
+			LEA R0, NO
+			PUTS
+			HALT
+
 
 ;----------
 ;Local data 
 ;----------
+YES .STRINGZ "This is a palidrome! \n"
+NO .STRINGZ "This is a NOT palidrome! \n"
 GET_STR_SUB .FILL x3200
 IS_PAL .FILL x3800
 INPUT_ARRAY .FILL x3400
@@ -57,6 +69,10 @@ INPUT_LOOP
 	BRnzp INPUT_LOOP
 	
 	DONE_INPUT
+	
+	;TERMINATE THE ARRAY WITH A 0
+	AND R3, R3, #0
+	STR R6, R3, #0
 
 	LD R1, R1_3200
 	LD R2, R2_3200
@@ -77,6 +93,7 @@ ENTER .FILL #-10
 ;------------------------------------------
 ;-------BEGIN SUBROUTINE::IS_PALIDROME-------
 .ORIG x3800
+ST R7, R7_3800
 	;R5 currently has num chars
 	;R6 currently has address of string
 	;we will use r1 for first char
@@ -105,16 +122,19 @@ ENTER .FILL #-10
 		BRnzp COMPARE
 
 	NOT_PALI
-		LEA R0, INVALIDPALI
-		PUTS
-HALT
+		LD R4, INVALIDPALI
+		LD R7, R7_3800
+RET
 	
 	YES_PALI
-	LEA R0, VALIDPALI
-	PUTS
-HALT
+	LD R4, VALIDPALI
+	LD R7, R7_3800
+RET
 ;----------
-INVALIDPALI .STRINGZ "\n 0"
-VALIDPALI .STRINGZ "\n 1"
+R7_3800 .BLKW #1
+INVALIDPALI .FILL #0
+VALIDPALI .FILL #1
 .END
 ;-------------------------------------------
+.ORIG x3400
+.BLKW #100
