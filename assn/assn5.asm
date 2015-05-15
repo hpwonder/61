@@ -27,9 +27,6 @@ ADD R2, R1, #0
 LD R0, GET_INPUT ;enter subroutine GET_INPUT
 JSRR R0
 
-LD R0, MULT_OP ;enter subroutine MULT_OP
-JSRR R0
-
 LD R6, PRODFLAG ;keeps track of how many negative signs were entered
 
 ;========first number
@@ -49,8 +46,10 @@ JSRR R0
 LEA R0, EQUALS
 PUTS
 ;========== Product
-;checks overflow
-LD R0, SETTOZERO
+;calculates product
+LD R0, MULT_OP ;enter subroutine MULT_OP
+JSRR R0
+
 ;checks sign
 LD R0, SETTOZERO
 ADD R0, R6, #0
@@ -69,10 +68,6 @@ PUTS
 
 HALT
 
-OVERFLOW1
-LEA R0, OVERFLOW
-PUTS
-HALT
 ;---------------	
 ;Data
 ;---------------
@@ -288,6 +283,7 @@ NEGORZERO
 ;====main multiplication loop
 MULTWHILE
 	ADD R3, R3, R5
+	BRn ITOVERFLOW
 	ADD R4, R4, #-1
 BRp MULTWHILE
 
@@ -302,10 +298,16 @@ LD R7, R7_3400
 
 RET
 
+ITOVERFLOW
+LEA R0, OVERFLOWSTR
+PUTS
+HALT
+
 ITISZERO
 LD R3, RESETR ;one of the multipliers is 0, so product is 0
 BRnzp RESTORE
 ;---------------
+OVERFLOWSTR .STRINGZ "Overflow!\n"
 RESETR .FILL #0
 R0_3400 .BLKW #1
 R1_3400 .BLKW #1
@@ -510,7 +512,7 @@ R7_3800 .BLKW #1
 .ORIG x6000
 intro .STRINGZ	"Input a positive or negative decimal number (max 5 digits), followed by ENTER\n"
 .ORIG x6100	
-error_mes .STRINGZ	"ERROR INVALID INPUT\n"
+error_mes .STRINGZ	"\nERROR INVALID INPUT\n"
 ;---------------
 ;END of PROGRAM
 ;---------------
