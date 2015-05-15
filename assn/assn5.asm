@@ -372,7 +372,7 @@ PRINTSTART
 			PRINTZERO1
 			LD R0, CHECKZER
 			ADD R0, R1, #0
-			ADD R2, R1, #0
+			ADD R2, R2, #1
 			ADD R0, R0, R5 
 		 	OUT							;print
 	
@@ -398,7 +398,7 @@ PRINTSTART
 			PRINTZERO2
 			LD R0, CHECKZER
 			ADD R0, R1, #0
-			ADD R2, R1, #0
+			ADD R2, R2, #1
 			ADD R0, R0, R5 
 		 	OUT							;print
 	
@@ -424,7 +424,7 @@ PRINTSTART
 			PRINTZERO3
 			LD R0, CHECKZER
 			ADD R0, R1, #0
-			ADD R2, R1, #0
+			ADD R2, R2, #1
 			ADD R0, R0, R5 
 		 	OUT							;print
 	
