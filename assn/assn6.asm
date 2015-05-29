@@ -42,6 +42,8 @@
 ;INSERT CODE For Subroutine MENU
 ;--------------------------------
 .ORIG x3100
+	ST R7, R7HOLDER1
+
 	MENUSTART
 	LD R0, Menu_string_addr
 	PUTS
@@ -120,7 +122,8 @@
 		PUTS
 		LEA R0, Exit_str
 		PUTS
-	RET
+		LD R7, R7HOLDER1
+		RET
 ;--------------------------------
 ;Data for subroutine MENU
 ;--------------------------------
@@ -135,13 +138,14 @@ entered5 .FILL #-53
 entered6 .FILL #-54
 entered7 .FILL #-55
 newline1 .STRINGZ "\n"
+R7HOLDER1 .BLKW #1
 
 CHECKALL .FILL x3200
 CHECKALLFREE .FILL x3300
-CHECKBUSY .FILL x2350
+CHECKBUSY .FILL x5350
 CHECKNUMFREE .FILL x3500
 CHECKSPECIFIC .FILL x4600
-CHECKAVAIL .FILL x2700
+CHECKAVAIL .FILL x5700
 ;-----------------------------------------------------------------------------------------------------------------
 ; Subroutine: ALL_MACHINES_BUSY
 ; Inputs: None
@@ -239,7 +243,7 @@ R7HOLDER .BLKW #1
 ;-------------------------------
 ;INSERT CODE For Subroutine NUM_BUSY_MACHINES
 ;--------------------------------
-.ORIG x2350
+.ORIG x5350
 	ST R7, R7HOLDER3
 	LD R6, VECTOR3
 	LDR R6, R6, #0
@@ -430,7 +434,7 @@ SPECIALTEST .FILL x8000
 ;-------------------------------
 ;INSERT CODE For Subroutine FIRST_FREE
 ;--------------------------------
-.ORIG x2700
+.ORIG x5700
 	ST R7, R7HOLDER5
 	LD R6, VECTOR5
 	LDR R6, R6, #0
